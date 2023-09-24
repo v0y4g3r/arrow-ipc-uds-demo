@@ -20,7 +20,7 @@ arrow = "40"
 arrow-array = "40"
 arrow-schema = "40"
 arrow-ipc = "40"
-mmap-sync = "1.0.0"
+memmap2 = "0.7"
 tonic = "0.10"
 tokio = { version = "1.21", features = ["full"] }
 tokio-stream = { version = "0.1", features = ["net"] }

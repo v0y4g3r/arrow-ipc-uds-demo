@@ -1,5 +1,7 @@
 use api::shm_server::{Shm, ShmServer};
 use api::{IngestResponse, Notification};
+use memmap2::Mmap;
+use std::ops::Deref;
 use tokio::net::UnixListener;
 use tokio_stream::wrappers::UnixListenerStream;
 use tonic::{Request, Response, Status};
@@ -29,14 +31,18 @@ impl Shm for ShmServerImpl {
         let notification = request.into_inner();
         println!("{}", notification.file_name);
 
-        let mut reader = arrow_ipc::reader::FileReader::try_new(
-            std::fs::OpenOptions::new()
-                .read(true)
-                .open(notification.file_name)
-                .unwrap(),
-            None,
-        )
-        .unwrap();
+        let file = std::fs::OpenOptions::new()
+            .read(true)
+            .open(notification.file_name)
+            .unwrap();
+
+        let mapped = unsafe { Mmap::map(&file).unwrap() };
+        let start = notification.start as usize;
+        let end = notification.end as usize;
+        let data = mapped.deref();
+        let buffer = std::io::Cursor::new(&data[start..end]);
+
+        let mut reader = arrow_ipc::reader::FileReader::try_new(buffer, None).unwrap();
 
         // read file
         while let Some(batch) = reader.next() {
