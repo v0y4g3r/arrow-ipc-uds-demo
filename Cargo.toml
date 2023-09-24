@@ -3,6 +3,9 @@ name = "arrow-ipc-demo"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = [".", "src/api"]
+
 [[bin]]
 name = "server"
 path = "./src/server.rs"
@@ -12,6 +15,7 @@ name = "client"
 path = "./src/client.rs"
 
 [dependencies]
+api = { path = "./src/api" }
 arrow = "40"
 arrow-array = "40"
 arrow-schema = "40"
@@ -19,6 +23,5 @@ arrow-ipc = "40"
 mmap-sync = "1.0.0"
 tonic = "0.10"
 tokio = { version = "1.21", features = ["full"] }
-tokio-stream = { version = "0.1" , features = ["net"]}
-api = { path = "./src/api" }
+tokio-stream = { version = "0.1", features = ["net"] }
 tower = "0.4.13"
