@@ -5,11 +5,26 @@ use arrow_array::{
 use arrow_schema::{DataType, Field, Schema};
 use std::sync::Arc;
 use std::time::UNIX_EPOCH;
+use tokio::net::UnixStream;
+use tonic::transport::{Endpoint, Uri};
+use tower::service_fn;
 
 #[tokio::main]
 async fn main() {
-    let addr = "http://127.0.0.1:4013".to_string();
-    let mut client: ShmClient<tonic::transport::Channel> = ShmClient::connect(addr).await.unwrap();
+    let sock_file = "/tmp/greptimedb.sock";
+
+    // We will ignore this uri because uds do not use it if your connector does use the uri it will
+    // be provided as the request to the `MakeConnection`.
+    let channel = Endpoint::try_from("http://[::]:50051")
+        .unwrap()
+        .connect_with_connector(service_fn(move |_: Uri| {
+            // Connect to a Uds socket
+            UnixStream::connect(sock_file)
+        }))
+        .await
+        .unwrap();
+
+    let mut client = ShmClient::new(channel);
 
     // write batches to local file.
     let data_file = write_batch();

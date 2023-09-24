@@ -19,4 +19,6 @@ arrow-ipc = "40"
 mmap-sync = "1.0.0"
 tonic = "0.10"
 tokio = { version = "1.21", features = ["full"] }
+tokio-stream = { version = "0.1" , features = ["net"]}
 api = { path = "./src/api" }
+tower = "0.4.13"

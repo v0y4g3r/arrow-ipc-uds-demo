@@ -1,16 +1,20 @@
 use api::shm_server::{Shm, ShmServer};
 use api::{IngestResponse, Notification};
+use tokio::net::UnixListener;
+use tokio_stream::wrappers::UnixListenerStream;
 use tonic::{Request, Response, Status};
 
 struct ShmServerImpl {}
 
 impl ShmServerImpl {
-    pub async fn start(addr: String) {
-        let addr = addr.parse().unwrap();
-        println!("Starting client at {}", addr);
+    pub async fn start() {
+        let path = "/tmp/greptimedb.sock";
+        println!("Starting client at {}", path);
+        let uds_stream = UnixListenerStream::new(UnixListener::bind(path).unwrap());
+
         tonic::transport::Server::builder()
             .add_service(ShmServer::new(ShmServerImpl {}))
-            .serve(addr)
+            .serve_with_incoming(uds_stream)
             .await
             .unwrap();
     }
@@ -45,5 +49,5 @@ impl Shm for ShmServerImpl {
 
 #[tokio::main]
 async fn main() {
-    ShmServerImpl::start("127.0.0.1:4013".to_string()).await;
+    ShmServerImpl::start().await;
 }
