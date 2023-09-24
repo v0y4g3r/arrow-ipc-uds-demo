@@ -1,0 +1,22 @@
+[package]
+name = "arrow-ipc-demo"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "server"
+path = "./src/server.rs"
+
+[[bin]]
+name = "client"
+path = "./src/client.rs"
+
+[dependencies]
+arrow = "40"
+arrow-array = "40"
+arrow-schema = "40"
+arrow-ipc = "40"
+mmap-sync = "1.0.0"
+tonic = "0.10"
+tokio = { version = "1.21", features = ["full"] }
+api = { path = "./src/api" }

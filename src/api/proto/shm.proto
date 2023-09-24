@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto;
+
+message Notification{
+  string file_name = 1;
+}
+
+message IngestResponse{
+  bool success =1;
+}
+
+service Shm {
+  rpc notify(Notification) returns (IngestResponse){}
+}
